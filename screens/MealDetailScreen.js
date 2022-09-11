@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useContext, useLayoutEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 
 import IconButton from '../components/IconButton';
@@ -6,14 +6,25 @@ import List from '../components/MealDetail/List';
 import Subtitle from '../components/MealDetail/Subtitle';
 import MealDetails from '../components/MealDetails';
 import { MEALS } from '../data/dummy-data';
+import FavoritesContextProvider from '../store/context/favorites-context';
 
 function MealDetailScreen({ route, navigation }) {
+
+  const favMealContext = useContext(FavoritesContextProvider);
+
   const mealId = route.params.mealId;
 
   const selectedMeal = MEALS.find((meal) => meal.id === mealId);
 
-  function headerButtonPressHandler() {
+  const isFavorite = favMealContext.ids.include(mealId)
+
+  function changeFav() {
     console.log('Pressed!');
+    if(isFavorite){
+      favMealContext.removeFavourite(mealId)
+    }else{
+      favMealContext.addFavourite(mealId)
+    }
   }
 
   useLayoutEffect(() => {
@@ -21,9 +32,9 @@ function MealDetailScreen({ route, navigation }) {
       headerRight: () => {
         return (
           <IconButton
-            icon="star"
+            icon={isFavorite ? 'start':'start-outline'}
             color="white"
-            onPress={headerButtonPressHandler}
+            onPress={changeFav}
           />
         );
       },
